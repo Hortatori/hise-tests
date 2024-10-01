@@ -7,6 +7,7 @@ import pickle
 import torch
 
 def get_event2012_closed_set_test_df(df):
+    print("event 2012, df opened, shape ", df.shape)
     save_path = './data/Event2012/closed_set/'
     if not exists(save_path):
         os.makedirs(save_path)
@@ -20,9 +21,12 @@ def get_event2012_closed_set_test_df(df):
         test_df = df.iloc[test_mask]
         test_df_np = test_df.to_numpy()
         np.save(test_set_df_np_path, test_df_np)
+    print("event 2012, df masked saved", test_df_np.shape)
     return
 
 def get_event2018_closed_set_test_df(df):
+    print("2018, df starts shape", df.shape)
+
     save_path = './data/Event2018/closed_set/'
     if not exists(save_path):
         os.makedirs(save_path)
@@ -42,7 +46,8 @@ def get_event2012_closed_set_messages_embeddings():
     
     SBERT_embedding_path = f'{save_path}/SBERT_embeddings.pkl'
     if not exists(SBERT_embedding_path):
-        test_set_df_np_path = save_path + 'test_set.npy'
+        test_set_df_np_path = save_path + 'all_set.npy'
+        # test_set_df_np_path = save_path + 'test_set.npy'
         test_df_np = np.load(test_set_df_np_path, allow_pickle=True)
         test_df = pd.DataFrame(data=test_df_np, columns=["event_id", "tweet_id", "text", "user_id", "created_at", "user_loc",\
                 "place_type", "place_full_name", "place_country_code", "hashtags", "user_mentions", "image_urls", "entities", 
@@ -56,6 +61,7 @@ def get_event2012_closed_set_messages_embeddings():
 
         # get SBERT embeddings
         embeddings = SBERT_embed(processed_text, language = 'English')
+        print("embeddings 2012 shape", embeddings.shape)
 
         # store SBERT embeddings
         with open(SBERT_embedding_path, 'wb') as fp:
@@ -68,7 +74,8 @@ def get_event2018_closed_set_messages_embeddings():
     
     SBERT_embedding_path = f'{save_path}/SBERT_embeddings.pkl'
     if not exists(SBERT_embedding_path):
-        test_set_df_np_path = save_path + 'test_set.npy'
+        test_set_df_np_path = save_path + 'all_set.npy'
+        # test_set_df_np_path = save_path + 'test_set.npy'
         test_df_np = np.load(test_set_df_np_path, allow_pickle=True)
         test_df = pd.DataFrame(data=test_df_np, columns=["tweet_id", "user_name", "text", "time", "event_id", "user_mentions", \
             "hashtags", "urls", "words", "created_at", "filtered_words", "entities", "sampled_words"])
@@ -82,6 +89,7 @@ def get_event2018_closed_set_messages_embeddings():
 
         # get SBERT embeddings
         embeddings = SBERT_embed(processed_text, language = 'French')
+        print("embedding 2018 shape :", embeddings.shape)
 
         # store SBERT embeddings
         with open(SBERT_embedding_path, 'wb') as fp:
@@ -106,7 +114,7 @@ def get_event2012_open_set_messages_embeddings():
             df = pd.DataFrame(data=df_np, columns=["original_index", "event_id", "tweet_id", "text", "user_id", "created_at", "user_loc",\
                 "place_type", "place_full_name", "place_country_code", "hashtags", "user_mentions", "image_urls", "entities", 
                 "words", "filtered_words", "sampled_words", "date"])
-            print("Dataframe loaded.")
+            print("Dataframe loaded. shape :", df.shape)
             #print('df.head(5): \n', df.head(5))
 
             # preprocess the text contents of the messages
@@ -151,6 +159,13 @@ def get_event2018_open_set_messages_embeddings():
                 pickle.dump(embeddings, fp)
             print('SBERT embeddings stored.')
     return
+
+
+# def split_open_set(df, root_path, dataset = '2012') :
+#     if not exists(root_path):
+#         os.makedirs(root_path)
+#     df_np_path = folder + '0.npy'
+
 
 def split_open_set(df, root_path, dataset = '2012'):
     if not exists(root_path):
@@ -206,6 +221,7 @@ def preprocess_event2012():
         "place_type", "place_full_name", "place_country_code", "hashtags", "user_mentions", "image_urls", "entities", 
         "words", "filtered_words", "sampled_words"])
     print("Data converted to dataframe.")
+    print("2012 tweets shape df preembed", df.shape)
 
     # open-set setting
     # split the df by dates
@@ -216,7 +232,13 @@ def preprocess_event2012():
 
     # close-set setting
     # get test set df
-    get_event2012_closed_set_test_df(df)
+    # get_event2012_closed_set_test_df(df)
+    df_np = df.to_numpy()
+    save_path = './data/Event2012/closed_set/'
+    if not exists(save_path):
+        os.makedirs(save_path)
+    print("2012 tweets df_np.shape", df_np.shape)
+    np.save(save_path+'all_set.npy', df_np)
     # get SBERT embeddings
     get_event2012_closed_set_messages_embeddings()
     
@@ -229,6 +251,7 @@ def preprocess_event2018():
     df_np = np.load('./raw_data/Event2018/french_tweets.npy', allow_pickle=True)
     df = pd.DataFrame(data=df_np, columns=columns)
     print("Data converted to dataframe.")
+    print('2018 fr shape tweets dataframe', df.shape)
 
     # open-set setting
     # split the df by dates
@@ -239,7 +262,13 @@ def preprocess_event2018():
 
     # close-set setting
     # get test set df
-    get_event2018_closed_set_test_df(df)
+    df_np = df.to_numpy()
+    save_path = './data/Event2018/closed_set/'
+    if not exists(save_path):
+        os.makedirs(save_path)
+    np.save(save_path+'all_set.npy', df_np)
+
+    # get_event2018_closed_set_test_df(df)
     # get SBERT embeddings
     get_event2018_closed_set_messages_embeddings()
 

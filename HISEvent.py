@@ -4,6 +4,7 @@ from itertools import combinations, chain
 import numpy as np
 
 def search_stable_points(embeddings, max_num_neighbors = 200):
+    print("search_stable_points ENTRY")
     corr_matrix = np.corrcoef(embeddings)
     np.fill_diagonal(corr_matrix, 0)
     corr_matrix_sorted_indices = np.argsort(corr_matrix)
@@ -11,7 +12,9 @@ def search_stable_points(embeddings, max_num_neighbors = 200):
     all_1dSEs = []
     seg = None
     for i in range(max_num_neighbors):
+        print("max num neighbors : ", max_num_neighbors, "starting corr_matrix")
         dst_ids = corr_matrix_sorted_indices[:, -(i+1)]
+        print("succeeded corr_matrix")
         knn_edges = [(s+1, d+1, corr_matrix[s, d]) \
             for s, d in enumerate(dst_ids) if corr_matrix[s, d] > 0] # (s+1, d+1): +1 as node indexing starts from 1 instead of 0
         if i == 0:
@@ -21,6 +24,7 @@ def search_stable_points(embeddings, max_num_neighbors = 200):
             all_1dSEs.append(seg.calc_1dSE())
         else:
             all_1dSEs.append(seg.update_1dSE(all_1dSEs[-1], knn_edges))
+        print("end neighbour")
     
     #print('all_1dSEs: ', all_1dSEs)
     stable_indices = []
