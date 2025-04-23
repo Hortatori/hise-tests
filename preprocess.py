@@ -5,6 +5,7 @@ from os.path import exists
 from utils import preprocess_sentence, preprocess_french_sentence, SBERT_embed
 import pickle
 import torch
+import csv
 
 def get_event2012_closed_set_test_df(df):
     print("event 2012, df opened, shape ", df.shape)
@@ -164,7 +165,19 @@ def get_event2018_open_set_messages_embeddings():
 # def split_open_set(df, root_path, dataset = '2012') :
 #     if not exists(root_path):
 #         os.makedirs(root_path)
-#     df_np_path = folder + '0.npy'
+
+#     df['date'] = [d.date() for d in df['created_at']]
+#     splitted_np = np.array_split(df,4)
+#     # extract and save df slice
+#     for i in range(len(splitted_np)) :
+#         folder = root_path + str(i) + '/'
+#         if not exists(folder):
+#             os.mkdir(folder)
+#         df_np_path = folder + str(i) + '.npy'
+#         print(df_np_path)
+#         if not exists(df_np_path):
+#             np.save(df_np_path, splitted_np[i] )
+#             print(i, type(splitted_np[i]))
 
 
 def split_open_set(df, root_path, dataset = '2012'):
@@ -190,6 +203,10 @@ def split_open_set(df, root_path, dataset = '2012'):
         ini_df = df.loc[df['date'].isin(distinct_dates[:7])]  # find top 7 dates
         ini_df_np = ini_df.to_numpy()
         np.save(df_np_path, ini_df_np)
+        ini_df.to_csv(f'{folder + str(0)}.tsv',
+            sep="\t",
+            quoting=csv.QUOTE_ALL,
+            )
 
     # following dates -> block 1, 2, ...
     if dataset == '2012':
@@ -207,6 +224,10 @@ def split_open_set(df, root_path, dataset = '2012'):
             incr_df = df.loc[df['date'] == distinct_dates[i]]
             incr_df_np = incr_df.to_numpy()
             np.save(df_np_path, incr_df_np)
+            incr_df.to_csv(f'{folder + str(i - 6)}.tsv',
+            sep="\t",
+            quoting=csv.QUOTE_ALL,
+            )
     return
 
 def preprocess_event2012():

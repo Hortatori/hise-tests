@@ -1,5 +1,7 @@
 # HISEvent
-This repository contained the code and data of 'Hierarchical and Incremental Structural Entropy Minimization for Unsupervised Social Event Detection', accepted to AAAI 2024.
+This repository is a reproduction of the code and data of 'Hierarchical and Incremental Structural Entropy Minimization for Unsupervised Social Event Detection', accepted to AAAI 2024.
+
+We observed that executing HISEvent on the entire Event2012 dataset required substantial memory resources, exceeding 62 GB of RAM. In contrast, FSD operates with significantly lower memory requirements (less than 32GB of RAM).
 
 ## To run HISEvent
 
